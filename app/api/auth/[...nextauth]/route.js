@@ -21,46 +21,91 @@ export const authOptions = {
     async signIn({ user, profile }) {
       await connectDB();
 
+      // Build a reliable email (GitHub users may not have a public email)
       const email =
         user.email ||
         profile?.email ||
         `${profile?.login}@github.com`;
 
-      const existingUser = await User.findOne({ email });
+      const username =
+        profile?.login ||
+        email.split("@")[0] ||
+        user.name?.replace(/\s+/g, "").toLowerCase();
+
+      // Try to find user by email OR username
+      let existingUser = await User.findOne({
+        $or: [{ email }, { username }],
+      });
 
       if (!existingUser) {
-        const username =
-          profile?.login ||
-          email.split("@")[0] ||
-          user.name?.replace(/\s+/g, "").toLowerCase();
-
+        // Create new user
         await User.create({
           name: user.name,
           email,
           username,
-          profilepic: user.image,
+          profilepic: user.image || "",
         });
+      } else {
+        // Update profile pic from OAuth on every login (keeps it current)
+        if (user.image && !existingUser.profilepic) {
+          existingUser.profilepic = user.image;
+          await existingUser.save();
+        }
+        // Also update email if it was a placeholder before
+        if (
+          existingUser.email.endsWith("@github.com") &&
+          user.email &&
+          !user.email.endsWith("@github.com")
+        ) {
+          existingUser.email = user.email;
+          await existingUser.save();
+        }
       }
 
       return true;
     },
 
-    async session({ session }) {
+    async jwt({ token, user, profile }) {
+      // On first sign-in, attach the resolved email and username to the token
+      if (user) {
+        const email =
+          user.email ||
+          profile?.email ||
+          `${profile?.login}@github.com`;
+        token.email = email;
+        token.username =
+          profile?.login ||
+          email.split("@")[0] ||
+          user.name?.replace(/\s+/g, "").toLowerCase();
+      }
+      return token;
+    },
+
+    async session({ session, token }) {
       await connectDB();
 
+      // Use the token email (which is the resolved one from signIn)
+      const searchEmail = token.email || session.user.email;
+      const searchUsername = token.username;
+
+      // Find user by email OR username (handles GitHub edge cases)
       const dbUser = await User.findOne({
-        email: session.user.email,
+        $or: [
+          ...(searchEmail ? [{ email: searchEmail }] : []),
+          ...(searchUsername ? [{ username: searchUsername }] : []),
+        ],
       });
 
       if (dbUser) {
         session.user.id = dbUser._id;
         session.user.username = dbUser.username;
+        session.user.profilepic = dbUser.profilepic;
+        session.user.email = dbUser.email;
       }
 
       return session;
     },
   },
-
 
   secret: process.env.NEXTAUTH_SECRET,
 };

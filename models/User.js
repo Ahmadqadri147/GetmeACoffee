@@ -22,6 +22,19 @@ const userSchema = new Schema({
   },
   bio: {
     type: String,
+    default: "",
+  },
+  instagram: {
+    type: String,
+    default: "",
+  },
+  twitter: {
+    type: String,
+    default: "",
+  },
+  linkedin: {
+    type: String,
+    default: "",
   },
 }, { timestamps: true });
 

@@ -10,11 +10,9 @@ const Login = () => {
   const { data: session, status } = useSession();
 
   useEffect(() => {
-    if (session?.user?.name) {
-
-      router.replace(`/${session.user.name.replace(/\s/g, "")}`);
-    } else if (session) {
-      router.replace("/"); // Fallback or a generic logged-in page if username is not directly available
+    if (session) {
+      // Redirect to dashboard with a marker so dashboard knows this is post-login
+      router.replace("/dashboard?from=login");
     }
   }, [session, router]);
   // Loading state fix (hydration error avoid)
@@ -34,107 +32,68 @@ const Login = () => {
 
   return (
 
-    <div className="flex min-h-screen items-center justify-center p-2">
+    <div className="min-h-screen flex items-center justify-center p-4">
+      {/* Background Decorative Elements */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-1/4 -left-20 w-80 h-80 bg-blue-600/20 rounded-full blur-[100px]"></div>
+        <div className="absolute bottom-1/4 -right-20 w-80 h-80 bg-fuchsia-600/20 rounded-full blur-[100px]"></div>
+      </div>
 
-      <div className="relative w-full max-w-md rounded-lg bg-white p-5 shadow [background:radial-gradient(125%_125%_at_50%_10%,#fff_40%,#63e_100%)]">
-
-        <div className="text-center">
-          <p className="mb-3 text-2xl font-semibold text-slate-900">
-            Login to your account
-          </p>
-
-          <p className="text-sm text-slate-600">
-            You must be logged in to perform this action.
+      <div className="relative z-10 w-full max-w-md bg-white/5 backdrop-blur-2xl rounded-3xl p-8 border border-white/10 shadow-2xl">
+        <div className="text-center mb-10">
+          <h1 className="text-3xl md:text-4xl font-black text-white mb-3">
+            Welcome Back
+          </h1>
+          <p className="text-gray-400 text-sm">
+            Sign in to your account to continue ☕
           </p>
         </div>
 
-        <div className="mt-7 flex flex-col gap-2">
-
+        <div className="space-y-4">
           <button
             onClick={() => signIn("github")}
-            className="inline-flex h-10 w-full items-center justify-center gap-2 rounded border border-slate-300 bg-white p-2 text-sm font-medium text-black hover:bg-gray-50"
+            className="group relative w-full flex items-center justify-center gap-3 bg-white hover:bg-gray-100 text-gray-900 font-bold py-4 rounded-2xl transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg"
           >
             <img
               src="https://www.svgrepo.com/show/512317/github-142.svg"
-              className="h-[18px] w-[18px]"
+              className="h-6 w-6"
               alt="GitHub"
             />
-            Continue with GitHub
+            <span>Continue with GitHub</span>
+            <span className="absolute right-4 opacity-0 group-hover:opacity-100 transition-opacity">→</span>
           </button>
 
           <button
             onClick={() => signIn("google")}
-            className="inline-flex h-10 w-full items-center justify-center gap-2 rounded border border-slate-300 bg-white p-2 text-sm font-medium text-black hover:bg-gray-50"
+            className="group relative w-full flex items-center justify-center gap-3 bg-white/10 hover:bg-white/20 text-white font-bold py-4 rounded-2xl border border-white/10 transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg backdrop-blur-sm"
           >
             <img
               src="https://www.svgrepo.com/show/475656/google-color.svg"
-              className="h-[18px] w-[18px]"
+              className="h-6 w-6"
               alt="Google"
             />
-            Continue with Google
+            <span>Continue with Google</span>
+            <span className="absolute right-4 opacity-0 group-hover:opacity-100 transition-opacity">→</span>
           </button>
-
-          {/* Only keep this if LinkedIn provider configured */}
-          <button
-            onClick={() => signIn("linkedin")}
-            className="inline-flex h-10 w-full items-center justify-center gap-2 rounded border border-slate-300 bg-white p-2 text-sm font-medium text-black hover:bg-gray-50"
-          >
-            <img
-              src="https://www.svgrepo.com/show/448234/linkedin.svg"
-              className="h-[18px] w-[18px]"
-              alt="LinkedIn"
-            />
-            Continue with LinkedIn
-          </button>
-
         </div>
 
-        <div className="flex items-center gap-2 py-6 text-sm text-slate-500">
-          <div className="h-px w-full bg-slate-200"></div>
-          OR
-          <div className="h-px w-full bg-slate-200"></div>
+        <div className="flex items-center gap-4 my-10">
+          <div className="h-px flex-1 bg-white/10"></div>
+          <span className="text-[10px] text-gray-500 font-black uppercase tracking-[0.2em]">secure gateway</span>
+          <div className="h-px flex-1 bg-white/10"></div>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-3">
+        <div className="text-center space-y-4">
+          <p className="text-xs text-gray-500 max-w-[250px] mx-auto leading-relaxed">
+            By continuing, you agree to our Terms of Service and Privacy Policy.
+          </p>
 
-          <input
-            type="email"
-            placeholder="Email Address "
-            className="w-full placeholder:text-gray-500 text-black rounded-lg border px-3 py-2 outline-none focus:ring-2 focus:ring-black"
-            required
-          />
-
-          <input
-            type="password"
-            placeholder="Password"
-            className="w-full placeholder:text-gray-500 text-black rounded-lg border px-3 py-2 outline-none focus:ring-2 focus:ring-black"
-            required
-          />
-
-          <div className="text-right">
-            <a href="/forgot-password" className="text-sm text-blue-600 hover:underline">
-              Reset your password?
-            </a>
+          <div className="pt-4 flex items-center justify-center gap-2 text-sm">
+            <span className="text-gray-400">New here?</span>
+            <a href="/" className="text-blue-400 font-bold hover:underline">Go back home</a>
           </div>
-
-          <button
-            type="submit"
-            className="w-full rounded-lg bg-black py-2.5 text-white hover:bg-gray-900"
-          >
-            Continue
-          </button>
-
-        </form>
-
-        <div className="mt-6 text-center text-sm text-slate-600">
-          Don't have an account?
-          <a href="/signup" className="ml-1 font-medium text-blue-600">
-            Sign up
-          </a>
         </div>
-
       </div>
-
     </div>
 
   )
