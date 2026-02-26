@@ -11,8 +11,12 @@ const Login = () => {
 
   useEffect(() => {
     if (session) {
-      // Redirect to dashboard with a marker so dashboard knows this is post-login
-      router.replace("/dashboard?from=login");
+      // Redirect to dashboard if new, otherwise to their profile page
+      if (session.user.isNewUser) {
+        router.replace("/dashboard?from=login");
+      } else {
+        router.replace(`/${session.user.username}`);
+      }
     }
   }, [session, router]);
   // Loading state fix (hydration error avoid)

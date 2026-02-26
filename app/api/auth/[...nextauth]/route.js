@@ -45,6 +45,7 @@ export const authOptions = {
           username,
           profilepic: user.image || "",
         });
+        user.isNewUser = true; // Mark as new user for this session creation
       } else {
         // Update profile pic from OAuth on every login (keeps it current)
         if (user.image && !existingUser.profilepic) {
@@ -60,13 +61,14 @@ export const authOptions = {
           existingUser.email = user.email;
           await existingUser.save();
         }
+        user.isNewUser = false; // Mark as existing user
       }
 
       return true;
     },
 
     async jwt({ token, user, profile }) {
-      // On first sign-in, attach the resolved email and username to the token
+      // On first sign-in, attach the resolved email, username, and isNewUser flag to the token
       if (user) {
         const email =
           user.email ||
@@ -77,6 +79,7 @@ export const authOptions = {
           profile?.login ||
           email.split("@")[0] ||
           user.name?.replace(/\s+/g, "").toLowerCase();
+        token.isNewUser = user.isNewUser;
       }
       return token;
     },
@@ -101,6 +104,7 @@ export const authOptions = {
         session.user.username = dbUser.username;
         session.user.profilepic = dbUser.profilepic;
         session.user.email = dbUser.email;
+        session.user.isNewUser = token.isNewUser;
       }
 
       return session;
