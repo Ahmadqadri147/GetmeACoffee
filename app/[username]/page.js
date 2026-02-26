@@ -329,7 +329,7 @@ const UserProfilePage = ({ params }) => {
                   <span>Processing...</span>
                 </div>
               ) : (
-                "Send Coffee 🚀"
+                "Send Coffee "
               )}
             </button>
 

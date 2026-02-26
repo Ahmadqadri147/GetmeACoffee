@@ -386,7 +386,7 @@ const DashboardContent = () => {
                   </span>
                 ) : (
                   <span className="flex items-center justify-center gap-2">
-                    Update Profile <span className="text-xl group-hover:translate-x-1 transition-transform">🚀</span>
+                    Update Profile <span className="text-xl group-hover:translate-x-1 transition-transform"></span>
                   </span>
                 )}
               </button>
