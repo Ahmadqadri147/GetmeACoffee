@@ -2,14 +2,19 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
+import Link from "next/link";
 
 const UserProfilePage = ({ params }) => {
   const resolvedParams = React.use(params);
   const { username } = resolvedParams;
   const router = useRouter();
+  const { data: session } = useSession();
 
   const [profile, setProfile] = useState(null);
   const [loadingProfile, setLoadingProfile] = useState(true);
+
+  const isOwner = session?.user?.username === username;
 
   const [formData, setFormData] = useState({
     name: "",
@@ -152,7 +157,16 @@ const UserProfilePage = ({ params }) => {
       </div>
 
       {/* Profile Info */}
-      <div className="pt-16 md:pt-24 text-center px-4">
+      <div className="pt-16 md:pt-24 text-center px-4 relative">
+        {isOwner && (
+          <div className="absolute top-4 right-4 md:right-10">
+            <Link href="/dashboard">
+              <button className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white text-xs md:text-sm font-bold py-2 px-4 rounded-full border border-white/10 transition-all backdrop-blur-md">
+                ✏️ Edit Profile
+              </button>
+            </Link>
+          </div>
+        )}
         <h1 className="text-2xl md:text-3xl font-bold text-white uppercase tracking-tight">
           {displayName}!
         </h1>

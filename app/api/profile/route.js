@@ -57,8 +57,18 @@ export async function PUT(request) {
 
         if (!existingUser) {
             return NextResponse.json(
-                { success: false, error: "User not found" },
+                { success: false, error: "User not found in database" },
                 { status: 404 }
+            );
+        }
+
+        // Security check: Ensure the user is only updating their own data.
+        // Since we are using session.user.email to find and update, it's inherently safe,
+        // but we can also verify the username if it was passed.
+        if (body.username && body.username !== existingUser.username) {
+            return NextResponse.json(
+                { success: false, error: "Unauthorized: You can only update your own profile" },
+                { status: 403 }
             );
         }
 
