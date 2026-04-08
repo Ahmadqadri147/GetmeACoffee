@@ -12,8 +12,8 @@ export async function GET(request) {
             return NextResponse.json({ success: true, users: [] });
         }
 
-        // Search for users whose username starts with the query
-        // Case-insensitive search
+
+
         const users = await User.find({
             username: { $regex: `^${query}`, $options: "i" }
         })

@@ -6,12 +6,12 @@ export async function GET(request, { params }) {
     try {
         const { username } = await params;
 
-        // Connect to database
+
         await connectDB();
 
-        // Fetch successful payments for the specified user
+
         const payments = await Payment.find({ to_user: username, status: "success" })
-            .sort({ createdAt: -1 }) // Show latest first
+            .sort({ createdAt: -1 })
             .lean();
 
         return NextResponse.json({

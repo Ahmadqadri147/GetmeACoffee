@@ -26,18 +26,18 @@ const DashboardContent = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [toast, setToast] = useState({ show: false, message: "", type: "" });
 
-  // Redirect if unauthenticated
+
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/login");
     }
   }, [status, router]);
 
-  // Fetch existing profile data on mount
+
   useEffect(() => {
     if (status !== "authenticated") return;
 
-    // If session is ready but username is not available yet, stop loading anyway
+
     if (!session?.user?.username) {
       setIsLoading(false);
       return;
@@ -53,8 +53,8 @@ const DashboardContent = () => {
         if (data.success && data.user) {
           const u = data.user;
 
-          // Smart redirect: only auto-redirect to profile if user came from login
-          // If user navigated to /dashboard directly (e.g. from navbar), always show the form
+
+
           if (isFromLogin && u.bio && u.bio.trim()) {
             router.replace(`/${session.user.username}`);
             return;
@@ -95,7 +95,7 @@ const DashboardContent = () => {
     const file = e.target.files[0];
     if (!file) return;
 
-    // Validate file size (max 2MB)
+
     if (file.size > 2 * 1024 * 1024) {
       showToast("Image must be under 2MB", "error");
       return;

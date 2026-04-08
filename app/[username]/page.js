@@ -25,7 +25,7 @@ const UserProfilePage = ({ params }) => {
   const [payments, setPayments] = useState([]);
   const [loadingPayments, setLoadingPayments] = useState(true);
 
-  // Fetch user profile from DB
+
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -44,7 +44,7 @@ const UserProfilePage = ({ params }) => {
     fetchProfile();
   }, [username]);
 
-  // Fetch payments
+
   useEffect(() => {
     const fetchPayments = async () => {
       try {
@@ -116,7 +116,7 @@ const UserProfilePage = ({ params }) => {
     }
   };
 
-  // Dynamic values from profile (with fallbacks)
+
   const displayName =
     profile?.name ||
     username.charAt(0).toUpperCase() + username.slice(1);

@@ -8,7 +8,7 @@ export async function POST(request) {
         const body = await request.json();
         const { name, to_user, message, amount } = body;
 
-        // Validate required fields
+
         if (!name || !to_user || !message || !amount) {
             return NextResponse.json(
                 { success: false, error: "Missing required fields: name, to_user, message, amount" },
@@ -23,13 +23,13 @@ export async function POST(request) {
             );
         }
 
-        // Connect to database
+
         await connectDB();
 
-        // Initiate payment via the configured strategy
+
         const result = await initiatePayment({ name, to_user, message, amount });
 
-        // Save payment record to database
+
         const payment = await Payment.create({
             name,
             to_user,

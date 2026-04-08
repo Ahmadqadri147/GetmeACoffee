@@ -4,7 +4,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import connectDB from "@/utils/connectDB";
 import User from "@/models/User";
 
-// GET /api/profile?username=xyz — public fetch
+
 export async function GET(request) {
     try {
         await connectDB();
@@ -37,7 +37,7 @@ export async function GET(request) {
     }
 }
 
-// PUT /api/profile — authenticated update with conditional field logic
+
 export async function PUT(request) {
     try {
         const session = await getServerSession(authOptions);
@@ -52,7 +52,7 @@ export async function PUT(request) {
         await connectDB();
         const body = await request.json();
 
-        // Find the existing user
+
         const existingUser = await User.findOne({ email: session.user.email });
 
         if (!existingUser) {
@@ -62,9 +62,9 @@ export async function PUT(request) {
             );
         }
 
-        // Security check: Ensure the user is only updating their own data.
-        // Since we are using session.user.email to find and update, it's inherently safe,
-        // but we can also verify the username if it was passed.
+
+
+
         if (body.username && body.username !== existingUser.username) {
             return NextResponse.json(
                 { success: false, error: "Unauthorized: You can only update your own profile" },
@@ -72,37 +72,37 @@ export async function PUT(request) {
             );
         }
 
-        // --- Conditional Field Update (atomic upsert logic) ---
-        // Only overwrite a field if the incoming value is non-empty.
-        // This prevents null/undefined/empty strings from wiping existing data.
+
+
+
         const updateFields = {};
 
-        // Name: use new value if provided, else keep existing
+
         if (body.name && body.name.trim()) {
             updateFields.name = body.name.trim();
         }
 
-        // Bio
+
         if (body.bio && body.bio.trim()) {
             updateFields.bio = body.bio.trim();
         }
 
-        // Profile picture: fallback to OAuth image if nothing provided AND no existing pic
+
         if (body.profilepic && body.profilepic.trim()) {
             updateFields.profilepic = body.profilepic.trim();
         } else if (!existingUser.profilepic) {
-            // OAuth fallback — use the image from the session (GitHub/Google avatar)
+
             updateFields.profilepic = session.user.image || "";
         }
 
-        // Cover picture: fallback to default if nothing provided AND no existing pic
+
         if (body.coverpic && body.coverpic.trim()) {
             updateFields.coverpic = body.coverpic.trim();
         } else if (!existingUser.coverpic) {
             updateFields.coverpic = "/coverimg.jpg";
         }
 
-        // Social links
+
         if (body.instagram && body.instagram.trim()) {
             updateFields.instagram = body.instagram.trim();
         }
@@ -113,7 +113,7 @@ export async function PUT(request) {
             updateFields.linkedin = body.linkedin.trim();
         }
 
-        // Perform the atomic update
+
         const updatedUser = await User.findOneAndUpdate(
             { email: session.user.email },
             { $set: updateFields },

@@ -11,7 +11,7 @@ const Login = () => {
 
   useEffect(() => {
     if (session) {
-      // Redirect to dashboard if new, otherwise to their profile page
+
       if (session.user.isNewUser) {
         router.replace("/dashboard?from=login");
       } else {
@@ -19,17 +19,17 @@ const Login = () => {
       }
     }
   }, [session, router]);
-  // Loading state fix (hydration error avoid)
+
   if (status === "loading") {
     return <p className="text-center mt-10">Loading...</p>
   }
 
-  // Already logged in
+
   if (session) {
     return <p className="text-center mt-10">You are already logged in ✅</p>
   }
 
-  // Prevent page reload on form submit
+
   const handleSubmit = (e) => {
     e.preventDefault()
   }
